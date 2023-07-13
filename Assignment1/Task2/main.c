@@ -78,9 +78,6 @@
 /* Constants for the ComTest demo application tasks. */
 #define mainCOM_TEST_BAUD_RATE	( ( unsigned long ) 115200 )
 
-void Led1_Task( void *pvParameters );
-void Led2_Task( void *pvParameters );
-void Led3_Task( void *pvParameters );
 /*
  * Configure the processor for use with the Keil demo board.  This is very
  * minimal as most of the setup is managed by the settings in the project
@@ -92,6 +89,48 @@ static void prvSetupHardware( void );
 TaskHandle_t Led1_Task_Handler = NULL;
 TaskHandle_t Led2_Task_Handler = NULL;
 TaskHandle_t Led3_Task_Handler = NULL;
+void Led1_Task(void* pvParameters)
+{
+	/* Parameters are not used. */
+	(void)pvParameters;
+
+	for (;; )
+	{
+		GPIO_write(PORT_0, PIN1, PIN_IS_HIGH);
+		vTaskDelay(100);
+		GPIO_write(PORT_0, PIN1, PIN_IS_LOW);
+		vTaskDelay(100);
+	}
+}
+/*-----------------------------------------------------------*/
+void Led2_Task(void* pvParameters)
+{
+	/* Parameters are not used. */
+	(void)pvParameters;
+
+	for (;; )
+	{
+		GPIO_write(PORT_0, PIN2, PIN_IS_HIGH);
+		vTaskDelay(500);
+		GPIO_write(PORT_0, PIN2, PIN_IS_LOW);
+		vTaskDelay(500);
+	}
+}
+/*-----------------------------------------------------------*/
+void Led3_Task(void* pvParameters)
+{
+	/* Parameters are not used. */
+	(void)pvParameters;
+
+	for (;; )
+	{
+		GPIO_write(PORT_0, PIN3, PIN_IS_HIGH);
+		vTaskDelay(1000);
+		GPIO_write(PORT_0, PIN3, PIN_IS_LOW);
+		vTaskDelay(1000);
+	}
+}
+/*-----------------------------------------------------------*/
 /*
  * Application entry point:
  * Starts all the other tasks, then starts the scheduler. 
@@ -172,47 +211,6 @@ static void prvSetupHardware( void )
 	VPBDIV = mainBUS_CLK_FULL;
 }
 /*-----------------------------------------------------------*/
-void Led1_Task( void *pvParameters )
-{
-	/* Parameters are not used. */
-	( void ) pvParameters;
 
-	for( ;; )
-	{
-		GPIO_write(PORT_0,PIN1,PIN_IS_HIGH);
-		vTaskDelay( 100 );
-		GPIO_write(PORT_0,PIN1,PIN_IS_LOW);
-		vTaskDelay( 100 );
-	}
-}
-/*-----------------------------------------------------------*/
-void Led2_Task( void *pvParameters )
-{
-	/* Parameters are not used. */
-	( void ) pvParameters;
-
-	for( ;; )
-	{
-		GPIO_write(PORT_0,PIN2,PIN_IS_HIGH);
-		vTaskDelay( 500 );
-		GPIO_write(PORT_0,PIN2,PIN_IS_LOW);
-		vTaskDelay( 500 );
-	}
-}
-/*-----------------------------------------------------------*/
-void Led3_Task( void *pvParameters )
-{
-	/* Parameters are not used. */
-	( void ) pvParameters;
-
-	for( ;; )
-	{
-		GPIO_write(PORT_0,PIN3,PIN_IS_HIGH);
-		vTaskDelay( 1000 );
-		GPIO_write(PORT_0,PIN3,PIN_IS_LOW);
-		vTaskDelay( 1000 );
-	}
-}
-/*-----------------------------------------------------------*/
 
 

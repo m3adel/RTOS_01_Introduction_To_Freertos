@@ -86,8 +86,7 @@ static uint8_t u8_gs_currentLedState = LED_PERIODICITY_2;
 /* Constants for the ComTest demo application tasks. */
 #define mainCOM_TEST_BAUD_RATE	( ( unsigned long ) 115200 )
 
-void Led_Task( void *pvParameters );
-void Btn_Task( void *pvParameters );
+
 /*
  * Configure the processor for use with the Keil demo board.  This is very
  * minimal as most of the setup is managed by the settings in the project
@@ -98,6 +97,78 @@ static void prvSetupHardware( void );
 
 TaskHandle_t Led_Task_Handler = NULL;
 TaskHandle_t Btn_Task_Handler = NULL;
+void Led_Task(void* pvParameters)
+{
+	/* Parameters are not used. */
+	(void)pvParameters;
+
+	for (;; )
+	{
+		if (LED_PERIODICITY_1 == u8_gs_currentLedState)
+		{
+			GPIO_write(PORT_0, PIN1, PIN_IS_LOW);
+			vTaskDelay(80);
+		}
+		else if (LED_PERIODICITY_2 == u8_gs_currentLedState)
+		{
+			GPIO_write(PORT_0, PIN1, PIN_IS_HIGH);
+			vTaskDelay(400);
+			GPIO_write(PORT_0, PIN1, PIN_IS_LOW);
+			vTaskDelay(400);
+		}
+		else if (LED_PERIODICITY_3 == u8_gs_currentLedState)
+		{
+			GPIO_write(PORT_0, PIN1, PIN_IS_HIGH);
+			vTaskDelay(100);
+			GPIO_write(PORT_0, PIN1, PIN_IS_LOW);
+			vTaskDelay(100);
+		}
+		else
+		{
+			//do nothing
+		}
+	}
+}
+/*-----------------------------------------------------------*/
+void Btn_Task(void* pvParameters)
+{
+	/* Parameters are not used. */
+	(void)pvParameters;
+
+	for (;; )
+	{
+		uint64_t u64_l_PressStart = 0;
+		uint64_t u64_l_PressEnd = 0;
+		uint64_t u64_l_PressTimeElapsed = 0;
+		if (PIN_IS_LOW == GPIO_read(PORT_0, PIN0))
+		{
+			u64_l_PressStart = xTaskGetTickCount();
+			vTaskDelay(18);
+			while (PIN_IS_LOW == GPIO_read(PORT_0, PIN0))
+				u64_l_PressEnd = xTaskGetTickCount();
+			u64_l_PressTimeElapsed = u64_l_PressEnd - u64_l_PressStart;
+			if (2000 > u64_l_PressTimeElapsed)
+			{
+				u8_gs_currentLedState = LED_PERIODICITY_1;
+			}
+			else if ((2000 < u64_l_PressTimeElapsed) && (4000 > u64_l_PressTimeElapsed))
+			{
+				u8_gs_currentLedState = LED_PERIODICITY_2;
+			}
+			else
+			{
+				u8_gs_currentLedState = LED_PERIODICITY_3;
+			}
+		}
+		else
+		{
+			//do nothing
+		}
+
+	}
+}
+
+/*-----------------------------------------------------------*/
 /*
  * Application entry point:
  * Starts all the other tasks, then starts the scheduler. 
@@ -173,77 +244,6 @@ static void prvSetupHardware( void )
 	VPBDIV = mainBUS_CLK_FULL;
 }
 /*-----------------------------------------------------------*/
-void Led_Task( void *pvParameters )
-{
-	/* Parameters are not used. */
-	( void ) pvParameters;
 
-	for( ;; )
-	{
-		if (LED_PERIODICITY_1 == u8_gs_currentLedState)
-		{
-			GPIO_write(PORT_0,PIN1,PIN_IS_LOW);
-			vTaskDelay( 80 );
-		}		
-		else if (LED_PERIODICITY_2 == u8_gs_currentLedState)
-		{
-			GPIO_write(PORT_0,PIN1,PIN_IS_HIGH);
-			vTaskDelay( 400 );
-			GPIO_write(PORT_0,PIN1,PIN_IS_LOW);
-			vTaskDelay( 400 );
-		}
-		else if (LED_PERIODICITY_3 == u8_gs_currentLedState)
-		{
-			GPIO_write(PORT_0,PIN1,PIN_IS_HIGH);
-			vTaskDelay( 100 );
-			GPIO_write(PORT_0,PIN1,PIN_IS_LOW);
-			vTaskDelay( 100 );
-		}		
-		else
-		{
-			//do nothing
-		}
-	}
-}
-/*-----------------------------------------------------------*/
-void Btn_Task( void *pvParameters )
-{
-	/* Parameters are not used. */
-	( void ) pvParameters;
-
-	for( ;; )
-	{
-		uint64_t u64_l_PressStart = 0;
-		uint64_t u64_l_PressEnd = 0;
-		uint64_t u64_l_PressTimeElapsed = 0;
-		if( PIN_IS_LOW == GPIO_read( PORT_0, PIN0))
-		{
-			u64_l_PressStart = xTaskGetTickCount();
-			vTaskDelay( 18 );
-			while(PIN_IS_LOW == GPIO_read( PORT_0, PIN0))
-			u64_l_PressEnd = xTaskGetTickCount();
-			u64_l_PressTimeElapsed = u64_l_PressEnd - u64_l_PressStart;
-			if (2000 > u64_l_PressTimeElapsed)
-			{
-				u8_gs_currentLedState = LED_PERIODICITY_1;
-			}		
-			else if ((2000 < u64_l_PressTimeElapsed)&&(4000 > u64_l_PressTimeElapsed))
-			{
-				u8_gs_currentLedState = LED_PERIODICITY_2;
-			}
-			else
-			{
-				u8_gs_currentLedState = LED_PERIODICITY_3;
-			}		
-		}
-		else
-		{
-			//do nothing
-		}
-		
-	}
-}
-
-/*-----------------------------------------------------------*/
 
 
